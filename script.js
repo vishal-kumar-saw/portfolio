@@ -23,43 +23,33 @@ for (let link of links) {
 // skill bar auto fill
 
 const progressBars = document.querySelectorAll('.skill-bars');
-const skillsContainer = document.getElementById('skills-container');
 
-const isVisible = (element) => {
-    const position = element.getBoundingClientRect();
-    if (position.top >= 0 && position.bottom <= window.innerHeight) {
-        return true;
-    }
-    if (position.top < window.innerHeight && position.bottom >= 0) {
-        return true;
-    }
-    return false;
+
+const initialiseBar = (bar) => {
+    bar.setAttribute('is-visited', false);
+    bar.style.width = 0 + '%';
 }
 
-let animationDone = false;
-
-const initialiseBars = () => {
-    for (let bar of progressBars) {
-        bar.style.width = 0 + '%';
-    }
+for (let bar of progressBars) {
+    initialiseBar(bar);
 }
 
-const fillBars = () => {
-    for (let bar of progressBars) {
-        bar.style.transition = 'all 0.5s linear';
-        bar.style.width = bar.getAttribute('value') + '%';
-    }
+const fillBar = (bar) => {
+    bar.style.transition = 'all 0.5s linear';
+    bar.style.width = bar.getAttribute('value') + '%';
 }
-initialiseBars();
+
 window.addEventListener('scroll', () => {
-    if (!animationDone && isVisible(skillsContainer)) {
-        fillBars();
-        animationDone = true;
-    }
-
-    if (isVisible(document.querySelector('.nav-menu'))) {
-        initialiseBars();
-        animationDone = false;
+    for (let bar of progressBars) {
+        let barCoordinates = bar.getBoundingClientRect();
+        if ((bar.getAttribute('data-visited') == 'false') &&
+            (barCoordinates.top <= (window.innerHeight - barCoordinates.height))) {
+            bar.setAttribute("data-visited", true);
+            fillBar(bar);
+        } else if (barCoordinates.top > window.innerHeight) {
+            bar.setAttribute("data-visited", false);
+            initialiseBar(bar);
+        }
     }
 });
 
